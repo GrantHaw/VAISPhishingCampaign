@@ -12,8 +12,8 @@
 </head>
 <body>
   <h2>🔐  Enter the password</h2>
-  <form id="pwForm">
-    <input id="pw" type="password" placeholder="Password" autocomplete="off" />
+  <form action="check.php" method="get">
+    <input id="pw" name="pw" type="password" placeholder="Password" />
     <button type="submit">Submit</button>
   </form>
   <div id="msg"></div>
