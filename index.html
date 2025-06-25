@@ -12,29 +12,35 @@
 </head>
 <body>
   <h2>🔐  Enter the password</h2>
-  <form action="check.php" method="get">
-    <input id="pw" name="pw" type="password" placeholder="Password" />
+
+  <!-- submit to check.php, but JavaScript intercepts so page doesn’t reload -->
+  <form id="pwForm" action="check.php" method="get">
+    <input id="pw" name="pw" type="password" placeholder="Password" autofocus />
     <button type="submit">Submit</button>
   </form>
+
   <div id="msg"></div>
 
   <script>
-    const SECRET = "dragon";
-
-    document.getElementById("pwForm").addEventListener("submit", e => {
+    // Intercept the form, send the guess to check.php, and display the reply
+    document.getElementById('pwForm').addEventListener('submit', async e => {
       e.preventDefault();
-      const guess = document.getElementById("pw").value.trim();
-      const msg   = document.getElementById("msg");
 
-      if (guess === SECRET){
-        msg.textContent = "Password accepted!  Welcome, Administrator.";
-        msg.style.color = "green";
-      } else {
-        msg.textContent = "Incorrect.";
-        msg.style.color = "red";
+      const pw   = document.getElementById('pw').value.trim();
+      const msg  = document.getElementById('msg');
+
+      try {
+        const res  = await fetch(`check.php?pw=${encodeURIComponent(pw)}`);
+        const text = await res.text();               // server reply
+        msg.textContent = text;
+        msg.style.color = text.startsWith('Password') ? 'green' : 'red';
+      } catch (err) {
+        msg.textContent = 'Error contacting server';
+        msg.style.color = 'red';
       }
-      document.getElementById("pw").value = "";
-      document.getElementById("pw").focus();
+
+      document.getElementById('pw').value = '';
+      document.getElementById('pw').focus();
     });
   </script>
 </body>
