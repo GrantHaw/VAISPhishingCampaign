@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual Brute-force Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 500px; margin: 4rem auto; }
+    input[type="password"]{ width: 100%; padding: .6rem; font-size: 1rem; }
+    button{ margin-top: .8rem; padding: .6rem 1.2rem; font-size: 1rem; }
+    #msg{ margin-top: 1.2rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>🔐  Enter the password</h2>
+  <form id="pwForm">
+    <input id="pw" type="password" placeholder="Password" autocomplete="off" />
+    <button type="submit">Submit</button>
+  </form>
+  <div id="msg"></div>
+
+  <script>
+    const SECRET = "dragon";
+
+    document.getElementById("pwForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const guess = document.getElementById("pw").value.trim();
+      const msg   = document.getElementById("msg");
+
+      if (guess === SECRET){
+        msg.textContent = "Password accepted!  Welcome, Administrator.";
+        msg.style.color = "green";
+      } else {
+        msg.textContent = "Incorrect.";
+        msg.style.color = "red";
+      }
+      document.getElementById("pw").value = "";
+      document.getElementById("pw").focus();
+    });
+  </script>
+</body>
+</html>
