@@ -1,71 +1,73 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - VAISDAY4TARGET
+name: Build & Deploy to Azure Web App (VAISDAY4TARGET)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
+
+env:
+  APP_NAME: VAISDAY4TARGET        # <- exact Web App name
+  ZIP_NAME: release.zip
+  NODE_VERSION: 22.x
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read              # checkout
 
     steps:
-      - uses: actions/checkout@v4
+      # ---- Pull repo ----
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js version
+      # ---- Node toolchain (only matters if you later add package.json) ----
+      - name: Set up Node
         uses: actions/setup-node@v3
         with:
-          node-version: '22.x'
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: npm install, build, and test
+      # ---- Optional install / build / test ----
+      # Will be skipped gracefully if no package.json exists.
+      - name: npm install / build / test (if present)
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          if [ -f package.json ]; then
+            echo "package.json found – running npm install/build/test"
+            npm install
+            npm run build --if-present
+            npm run test  --if-present
+          else
+            echo "No package.json – treating repo as static content"
+          fi
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      # ---- Package everything into a zip ----
+      - name: Zip site for deployment
+        run: zip -r ${{ env.ZIP_NAME }} . -x ".git/*" -x ".github/*"
 
-      - name: Upload artifact for deployment job
+      # ---- Upload artefact for the deploy job ----
+      - name: Upload artefact
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
-          path: release.zip
+          name: site-package
+          path: ${{ env.ZIP_NAME }}
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      contents: read               # download artefact
 
     steps:
-      - name: Download artifact from build job
+      # ---- Get artefact from build job ----
+      - name: Download artefact
         uses: actions/download-artifact@v4
         with:
-          name: node-app
+          name: site-package
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-      
-      - name: Login to Azure
-        uses: azure/login@v2
+      # ---- Deploy with publish profile (no AAD/OIDC hassles) ----
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9C42E83CBA1D47F3BA12033710178ED2 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5443A151BC224D0CBFB796739686F6CF }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_383039CF1DAB40BEA77AA22F3A0E076B }}
-
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'VAISDAY4TARGET'
-          slot-name: 'Production'
-          package: .
-          
+          app-name:     ${{ env.APP_NAME }}
+          package:      ${{ env.ZIP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
