@@ -1,5 +1,5 @@
 <?php
-$secret = '112233';                 // ← change here any time
+$secret = 'Qwerty1!';                 // ← change here any time
 $guess  = $_GET['pw'] ?? '';
 
 if ($guess === $secret) {
