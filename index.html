@@ -2,46 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Manual Brute-force Demo</title>
+  <title>You just got phished!</title>
   <style>
-    body { font-family: sans-serif; max-width: 500px; margin: 4rem auto; }
-    input[type="password"]{ width: 100%; padding: .6rem; font-size: 1rem; }
-    button{ margin-top: .8rem; padding: .6rem 1.2rem; font-size: 1rem; }
-    #msg{ margin-top: 1.2rem; font-weight: bold; }
+    body {font-family: system-ui, sans-serif; text-align: center; padding: 4rem;}
+    h1   {font-size: 3rem; color: crimson; margin-bottom: .5rem;}
+    p    {font-size: 1.2rem; max-width: 600px; margin: .8rem auto;}
+    section {border: 2px dashed crimson; padding: 2rem; border-radius: 12px;}
+    ul   {text-align: left; margin: 1rem auto; max-width: 480px;}
+    footer {margin-top: 3rem; font-size: .9rem; color: gray;}
+    a {color: royalblue;}
   </style>
 </head>
 <body>
-  <h2>🔐  Enter the password</h2>
-
-  <!-- submit to check.php, but JavaScript intercepts so page doesn’t reload -->
-  <form id="pwForm" action="check.php" method="get">
-    <input id="pw" name="pw" type="password" placeholder="Password" autofocus />
-    <button type="submit">Submit</button>
-  </form>
-
-  <div id="msg"></div>
-
-  <script>
-    // Intercept the form, send the guess to check.php, and display the reply
-    document.getElementById('pwForm').addEventListener('submit', async e => {
-      e.preventDefault();
-
-      const pw   = document.getElementById('pw').value.trim();
-      const msg  = document.getElementById('msg');
-
-      try {
-        const res  = await fetch(`check.php?pw=${encodeURIComponent(pw)}`);
-        const text = await res.text();               // server reply
-        msg.textContent = text;
-        msg.style.color = text.startsWith('Password') ? 'green' : 'red';
-      } catch (err) {
-        msg.textContent = 'Error contacting server';
-        msg.style.color = 'red';
-      }
-
-      document.getElementById('pw').value = '';
-      document.getElementById('pw').focus();
-    });
-  </script>
+  <section>
+    <h1>⚠️ You just got phished!</h1>
+    <p>
+      Don’t worry—this was a <strong>safe demonstration</strong>
+      to show how easily a convincing message can trick someone into clicking a link.
+    </p>
+    <h2>How real attackers succeed</h2>
+    <ul>
+      <li><strong>Urgency & Fear →</strong> “update your account in 10 min or it will be locked.”</li>
+      <li><strong>Authority →</strong> “IT Support” or “Payroll” demanding you act now.</li>
+      <li><strong>Curiosity/Reward →</strong> “See confidential results here.”</li>
+    </ul>
+    <h2>3 ways to spot a phish</h2>
+    <ul>
+      <li>Hover before you click—does the URL match the real domain?</li>
+      <li>Verify strange requests out-of-band (call the sender directly).</li>
+      <li>Watch for subtle misspellings and odd grammar.</li>
+    </ul>
+    <p>
+      Learn more at the <a href="https://www.consumer.ftc.gov/features/scam-alerts" target="_blank">FTC Scam Alerts</a>
+      or <a href="https://www.cyber.gov.au/acsc/view-all-content/threats/phishing" target="_blank">ACSC Phishing guidance</a>.
+    </p>
+  </section>
+  <footer>
+    © 2025 Demo by VAIS Cyber-Camp
+  </footer>
 </body>
 </html>
